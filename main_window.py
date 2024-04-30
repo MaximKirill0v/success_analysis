@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView
 from designer.main_window_d import Ui_MainWindow
 from ReadXlsx import ReadExcelPandas
+from data_base import DataBase
 import os
 
 
@@ -17,7 +18,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
-        self.ui.btn_confirm_choice.clicked.connect(self.check_for_file_existence)
+        self.ui.btn_confirm_choice.clicked.connect(self.create_db)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -50,18 +51,29 @@ class MainWindow(QMainWindow):
             if item is not None:
                 value = item.text()
                 path_list.append(value)
-        print(path_list)
         return path_list
 
-    @staticmethod
-    def path_redactor(path: str):
-        index_slash = path.rindex('/')
-        index_point = path.rindex('.')
-        edit_path = path[index_slash + 1:index_point] + '.db'
-        return edit_path
+    def get_path_list_table_widget(self):
+        return self.get_path_from_table_widget()
+
+    def pathname_concatenation(self):
+        path_list = self.get_path_from_table_widget()
+        if len(path_list) > 1:
+            res_name = ''
+            for path in path_list:
+                index_slash = path.rindex('/')
+                index_point = path.rindex('.')
+                edit_path = path[index_slash + 1:index_point]
+                res_name += edit_path + '_'
+            return res_name + '.db'
+        else:
+            index_slash = path_list[0].rindex('/')
+            index_point = path_list[0].rindex('.')
+            edit_path = path_list[0][index_slash + 1:index_point] + '.db'
+            return edit_path
 
     def get_data_frame(self):
-        path_list = self.get_path_from_table_widget()
+        path_list = self.get_path_list_table_widget()
         for path in path_list:
             reader = ReadExcelPandas(path)
             reader.delete_row(0)
@@ -69,7 +81,7 @@ class MainWindow(QMainWindow):
             yield df
 
     def get_surname_list_from_df(self):
-        path_list = self.get_path_from_table_widget()
+        path_list = self.get_path_list_table_widget()
         for path in path_list:
             reader = ReadExcelPandas(path)
             surname_list = reader.read_employee_surname_list()
@@ -77,11 +89,27 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def check_for_file_existence(path_to_file: str):
-        print(os.path.exists(path_to_file))
         return os.path.exists(path_to_file)
 
+    def create_db(self):
+        name_db = self.pathname_concatenation()
+        if not self.check_for_file_existence('data_base' + name_db):
+            all_df = self.get_data_frame()
+            # data_base = DataBase(name_db)
+            for df in all_df:
+                print(df)
+                for surname_list in self.get_surname_list_from_df():
+                    print(surname_list)
+                    # data_base.insert_values_into_db(df, name_db, surname_list)
 
+        # path_list = self.get_path_list_table_widget()
+        # if len(path_list) > 1:
+        #     name_file_db = self.pathname_concatenation(path_list)
+        # else:
+        #     name_file_db = self.path_redactor(path_list[0])
 
-
-
-
+        # all_df = self.get_data_frame()
+        # for df in all_df:
+        #     print(df)
+        # surname_list = self.get_surname_list_from_df()
+        # print(df, surname_list)
