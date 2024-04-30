@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView
 from designer.main_window_d import Ui_MainWindow
 from ReadXlsx import ReadExcelPandas
+import os
 
 
 class MainWindow(QMainWindow):
@@ -16,7 +17,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
-        self.ui.btn_confirm_choice.clicked.connect(self.get_data_frame)
+        self.ui.btn_confirm_choice.clicked.connect(self.check_for_file_existence)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -62,9 +63,23 @@ class MainWindow(QMainWindow):
     def get_data_frame(self):
         path_list = self.get_path_from_table_widget()
         for path in path_list:
-            edit_path = self.path_redactor(path)
             reader = ReadExcelPandas(path)
             reader.delete_row(0)
-            surname_list = reader.read_employee_surname_list()[0::2]
             df = reader.read_excel_file()
-            print(df, surname_list)
+            yield df
+
+    def get_surname_list_from_df(self):
+        path_list = self.get_path_from_table_widget()
+        for path in path_list:
+            reader = ReadExcelPandas(path)
+            surname_list = reader.read_employee_surname_list()
+            yield surname_list
+
+    @staticmethod
+    def check_for_file_existence(path_to_file: str):
+        print(os.path.exists(path_to_file))
+        return os.path.exists(path_to_file)
+
+
+
+
