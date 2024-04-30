@@ -109,7 +109,6 @@ class DataBase:
         with self.__connection:
             self.create_cursor()
             surname_point_lst = []
-            print("-----", surname_list)
             try:
                 for surname in surname_list[0::2]:
                     sql_request = f"""SELECT plan, fact FROM employees WHERE surname = '{surname}'"""
@@ -117,6 +116,36 @@ class DataBase:
                     surname_point = self.__cursor.fetchall()
                     surname_point_lst.append(surname_point)
                 return surname_point_lst
+            except Error as e:
+                print(e)
+            finally:
+                self.__cursor.close()
+
+    def get_supervisor_list(self):
+        with self.__connection:
+            self.create_cursor()
+            try:
+                sql_request = f"""SELECT supervisor FROM supervisor"""
+                self.__cursor.execute(sql_request)
+                supervisor_list = self.__cursor.fetchall()
+                return supervisor_list
+            except Error as e:
+                print(e)
+            finally:
+                self.__cursor.close()
+
+    def get_point_deadline_projects_supervisor(self):
+        with self.__connection:
+            self.create_cursor()
+            try:
+                sql_request = f"SELECT supervisor.supervisor " \
+                              f"FROM supervisor, project_deadline, projects " \
+                              f"WHERE (project_deadline.planned_delivery_date >= project_deadline.actual_delivery_date) " \
+                              f"AND projects.ID = project_deadline.project_ID " \
+                              f"AND projects.supervisor_ID = supervisor.ID"
+                self.__cursor.execute(sql_request)
+                point_deadline_projects_supervisor_list = self.__cursor.fetchall()
+                return point_deadline_projects_supervisor_list
             except Error as e:
                 print(e)
             finally:

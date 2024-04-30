@@ -11,13 +11,14 @@ class MainWindow(QMainWindow):
         self.table_widget = None
         self.dialog_window = None
         self.reader_excel = None
+        self.__employee_dict = {}
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.btn_confirm_choice.setDisabled(True)
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
-        self.ui.btn_confirm_choice.clicked.connect(self.get_point_employee_man_days)
+        self.ui.btn_confirm_choice.clicked.connect(self.get_point_employee_from_db)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -108,7 +109,7 @@ class MainWindow(QMainWindow):
             data_base.create_table_employees()
             data_base.create_table_project_deadline()
             data_base.insert_values_into_db(all_df[i], all_surname_list[i])
-            self.get_point_employee_man_days()
+            self.get_point_employee_from_db()
 
     @staticmethod
     def calculate_values(lst: list[tuple]) -> int:
@@ -129,7 +130,23 @@ class MainWindow(QMainWindow):
             flat_list.extend(sublist)
         return [flat_list]
 
-    def get_point_employee_man_days(self):
+    def convert_to_dictionary(self, employee_lst: list[tuple]):
+        for name, number in employee_lst:
+            if name not in self.__employee_dict:
+                self.__employee_dict[name] = [number]
+            else:
+                self.__employee_dict[name].append(number)
+
+    def append_point(self, supervisor_list: list[tuple]):
+        supervisor_lst = [item[0] for item in supervisor_list]
+        for supervisor in self.__employee_dict.keys():
+            if supervisor in supervisor_lst:
+                self.__employee_dict[supervisor].append(supervisor_lst.count(supervisor))
+            else:
+                self.__employee_dict[supervisor].append(0)
+
+    def get_point_employee_from_db(self):
+        self.__employee_dict = {}
         name_db = self.pathname_concatenation()
         all_surname_list = self.get_surname_list_from_df()
         if len(all_surname_list) > 1:
@@ -146,9 +163,13 @@ class MainWindow(QMainWindow):
             for point in points_employee:
                 calc_points = self.calculate_values(point)
                 points_all_employee_lst.append(calc_points)
-            print(all_surname_list[0][0::2])
-            print(points_all_employee_lst)
-            return points_all_employee_lst
 
-
-
+            point_plus_employee_man_days = list(zip(all_surname_list[0][0::2], points_all_employee_lst))
+            print(point_plus_employee_man_days)
+            self.convert_to_dictionary(point_plus_employee_man_days)
+            supervisor_list = data_base.get_supervisor_list()
+            point_deadline_projects_supervisor_list = data_base.get_point_deadline_projects_supervisor()
+            self.append_point(supervisor_list)
+            print(self.__employee_dict)
+            self.append_point(point_deadline_projects_supervisor_list)
+            print(self.__employee_dict)
