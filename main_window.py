@@ -1,5 +1,6 @@
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView, QMessageBox
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView
 from designer.main_window_d import Ui_MainWindow
+from ReadXlsx import ReadExcelPandas
 
 
 class MainWindow(QMainWindow):
@@ -15,6 +16,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
+        self.ui.btn_confirm_choice.clicked.connect(self.get_data_frame)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -40,4 +42,29 @@ class MainWindow(QMainWindow):
             self.ui.btn_confirm_choice.setDisabled(False)
             return self.table_widget
 
+    def get_path_from_table_widget(self):
+        path_list = []
+        for row in range(self.table_widget.rowCount()):
+            item = self.table_widget.item(row, 1)
+            if item is not None:
+                value = item.text()
+                path_list.append(value)
+        print(path_list)
+        return path_list
 
+    @staticmethod
+    def path_redactor(path: str):
+        index_slash = path.rindex('/')
+        index_point = path.rindex('.')
+        edit_path = path[index_slash + 1:index_point] + '.db'
+        return edit_path
+
+    def get_data_frame(self):
+        path_list = self.get_path_from_table_widget()
+        for path in path_list:
+            edit_path = self.path_redactor(path)
+            reader = ReadExcelPandas(path)
+            reader.delete_row(0)
+            surname_list = reader.read_employee_surname_list()[0::2]
+            df = reader.read_excel_file()
+            print(df, surname_list)
