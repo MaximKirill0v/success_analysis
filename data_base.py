@@ -109,13 +109,12 @@ class DataBase:
         with self.__connection:
             self.create_cursor()
             surname_point_lst = []
+            print("-----", surname_list)
             try:
                 for surname in surname_list[0::2]:
-                    print(surname)
                     sql_request = f"""SELECT plan, fact FROM employees WHERE surname = '{surname}'"""
                     self.__cursor.execute(sql_request)
                     surname_point = self.__cursor.fetchall()
-                    print(surname_point)
                     surname_point_lst.append(surname_point)
                 return surname_point_lst
             except Error as e:

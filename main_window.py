@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
-        self.ui.btn_confirm_choice.clicked.connect(self.get_point_employee)
+        self.ui.btn_confirm_choice.clicked.connect(self.get_point_employee_man_days)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -108,16 +108,47 @@ class MainWindow(QMainWindow):
             data_base.create_table_employees()
             data_base.create_table_project_deadline()
             data_base.insert_values_into_db(all_df[i], all_surname_list[i])
+            self.get_point_employee_man_days()
 
-    def get_point_employee(self):
+    @staticmethod
+    def calculate_values(lst: list[tuple]) -> int:
+        result = []
+        for item in lst:
+            if not item[0] and not item[1]:
+                result.append(0)
+            else:
+                first_val = item[0] if item[0] is not None else int(item[1]) * 2
+                second_val = item[1] if item[1] is not None else 0
+                result.append(int(first_val) - int(second_val))
+        return sum(result)
+
+    @staticmethod
+    def flatten_nested_list(nested_list):
+        flat_list = []
+        for sublist in nested_list:
+            flat_list.extend(sublist)
+        return [flat_list]
+
+    def get_point_employee_man_days(self):
         name_db = self.pathname_concatenation()
         all_surname_list = self.get_surname_list_from_df()
+        if len(all_surname_list) > 1:
+            all_surname_list = self.flatten_nested_list(all_surname_list)
 
         if not self.check_for_file_existence('data_base/' + name_db):
             self.create_db()
         else:
             data_base = DataBase(name_db)
             data_base.create_db()
+            points_employee = data_base.get_point_employee(*all_surname_list)
 
-            a = data_base.get_point_employee(*all_surname_list)
-            print(a)
+            points_all_employee_lst = []
+            for point in points_employee:
+                calc_points = self.calculate_values(point)
+                points_all_employee_lst.append(calc_points)
+            print(all_surname_list[0][0::2])
+            print(points_all_employee_lst)
+            return points_all_employee_lst
+
+
+
