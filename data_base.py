@@ -7,12 +7,13 @@ import os
 class DataBase:
     def __init__(self, path_to_db: str):
         self.__path_to_db = path_to_db
-        self.__directory = 'data_base'
+        self.__directory = 'data_base/'
         self.__connection = None
         self.__cursor = None
 
     def create_db(self):
-        self.__connection = sqlite3.connect(self.__path_to_db)
+        print(self.__directory + self.__path_to_db)
+        self.__connection = sqlite3.connect(self.__directory + self.__path_to_db)
         print(f'Соединение установлено.{self.__path_to_db}')
 
     def close_db(self):
@@ -37,6 +38,10 @@ class DataBase:
     def rename_directory(self, new_name: str):
         self.__directory = new_name
 
+    def create_directory(self):
+        if not os.path.exists(self.__directory):
+            os.mkdir(self.__directory)
+
     def create_table(self, name_table, column_names):
         with self.__connection:
             self.create_cursor()
@@ -53,7 +58,7 @@ class DataBase:
         self.create_table('supervisor', ['ID INTEGER PRIMARY KEY', 'supervisor TEXT'])
 
     def create_table_projects(self):
-        self.create_table('projects', ['ID INTEGER PRIMARY KEY', 'project_name TEXT UNIQUE', 'supervisor_ID INTEGER',
+        self.create_table('projects', ['ID INTEGER PRIMARY KEY', 'project_name TEXT', 'supervisor_ID INTEGER',
                                        'FOREIGN KEY (supervisor_ID) REFERENCES supervisor(ID)'])
 
     def create_table_employees(self):
@@ -65,10 +70,7 @@ class DataBase:
                                                'actual_delivery_date INTEGER', 'project_ID INTEGER',
                                                'FOREIGN KEY (project_ID) REFERENCES projects(ID)'])
 
-    def insert_values_into_db(self, data_frame: pd.DataFrame, name_db: str, surname_list: list):
-        # data_frame = self.get_df(path_to_excel_file)
-        # data_frame = self.drop_line_df(data_frame, line_number)
-        # surname_list = self.get_surname_list_df(data_frame)
+    def insert_values_into_db(self, data_frame: pd.DataFrame, surname_list: list):
 
         with self.__connection:
             self.create_cursor()
@@ -99,4 +101,6 @@ class DataBase:
             except Error:
                 return False
             finally:
+                print('До')
                 self.__cursor.close()
+                print('после')

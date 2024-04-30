@@ -74,18 +74,22 @@ class MainWindow(QMainWindow):
 
     def get_data_frame(self):
         path_list = self.get_path_list_table_widget()
+        all_df = []
         for path in path_list:
             reader = ReadExcelPandas(path)
             reader.delete_row(0)
             df = reader.read_excel_file()
-            yield df
+            all_df.append(df)
+        return all_df
 
     def get_surname_list_from_df(self):
         path_list = self.get_path_list_table_widget()
+        all_path_list = []
         for path in path_list:
             reader = ReadExcelPandas(path)
             surname_list = reader.read_employee_surname_list()
-            yield surname_list
+            all_path_list.append(surname_list)
+        return all_path_list
 
     @staticmethod
     def check_for_file_existence(path_to_file: str):
@@ -93,23 +97,18 @@ class MainWindow(QMainWindow):
 
     def create_db(self):
         name_db = self.pathname_concatenation()
-        if not self.check_for_file_existence('data_base' + name_db):
+        if not self.check_for_file_existence('data_base/' + name_db):
             all_df = self.get_data_frame()
-            # data_base = DataBase(name_db)
-            for df in all_df:
-                print(df)
-                for surname_list in self.get_surname_list_from_df():
-                    print(surname_list)
-                    # data_base.insert_values_into_db(df, name_db, surname_list)
+            all_surname_list = self.get_surname_list_from_df()
+            data_base = DataBase(name_db)
+            data_base.create_directory()
+            data_base.create_db()
+            for i in range(len(all_df)):
+                data_base.create_table_supervisor()
+                data_base.create_table_projects()
+                data_base.create_table_employees()
+                data_base.create_table_project_deadline()
+                data_base.insert_values_into_db(all_df[i], all_surname_list[i])
+        else:
+            print('папка data_base уже создана.')
 
-        # path_list = self.get_path_list_table_widget()
-        # if len(path_list) > 1:
-        #     name_file_db = self.pathname_concatenation(path_list)
-        # else:
-        #     name_file_db = self.path_redactor(path_list[0])
-
-        # all_df = self.get_data_frame()
-        # for df in all_df:
-        #     print(df)
-        # surname_list = self.get_surname_list_from_df()
-        # print(df, surname_list)
