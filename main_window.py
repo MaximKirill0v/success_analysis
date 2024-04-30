@@ -11,14 +11,13 @@ class MainWindow(QMainWindow):
         self.table_widget = None
         self.dialog_window = None
         self.reader_excel = None
-        # self.start_employee_in_file = 5
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.btn_confirm_choice.setDisabled(True)
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
-        self.ui.btn_confirm_choice.clicked.connect(self.create_db)
+        self.ui.btn_confirm_choice.clicked.connect(self.get_point_employee)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -97,18 +96,28 @@ class MainWindow(QMainWindow):
 
     def create_db(self):
         name_db = self.pathname_concatenation()
-        if not self.check_for_file_existence('data_base/' + name_db):
-            all_df = self.get_data_frame()
-            all_surname_list = self.get_surname_list_from_df()
-            data_base = DataBase(name_db)
-            data_base.create_directory()
-            data_base.create_db()
-            for i in range(len(all_df)):
-                data_base.create_table_supervisor()
-                data_base.create_table_projects()
-                data_base.create_table_employees()
-                data_base.create_table_project_deadline()
-                data_base.insert_values_into_db(all_df[i], all_surname_list[i])
-        else:
-            print('папка data_base уже создана.')
+        all_surname_list = self.get_surname_list_from_df()
 
+        all_df = self.get_data_frame()
+        data_base = DataBase(name_db)
+        data_base.create_directory()
+        data_base.create_db()
+        for i in range(len(all_df)):
+            data_base.create_table_supervisor()
+            data_base.create_table_projects()
+            data_base.create_table_employees()
+            data_base.create_table_project_deadline()
+            data_base.insert_values_into_db(all_df[i], all_surname_list[i])
+
+    def get_point_employee(self):
+        name_db = self.pathname_concatenation()
+        all_surname_list = self.get_surname_list_from_df()
+
+        if not self.check_for_file_existence('data_base/' + name_db):
+            self.create_db()
+        else:
+            data_base = DataBase(name_db)
+            data_base.create_db()
+
+            a = data_base.get_point_employee(*all_surname_list)
+            print(a)

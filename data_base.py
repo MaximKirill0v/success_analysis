@@ -104,3 +104,21 @@ class DataBase:
                 print('До')
                 self.__cursor.close()
                 print('после')
+
+    def get_point_employee(self, surname_list: list):
+        with self.__connection:
+            self.create_cursor()
+            surname_point_lst = []
+            try:
+                for surname in surname_list[0::2]:
+                    print(surname)
+                    sql_request = f"""SELECT plan, fact FROM employees WHERE surname = '{surname}'"""
+                    self.__cursor.execute(sql_request)
+                    surname_point = self.__cursor.fetchall()
+                    print(surname_point)
+                    surname_point_lst.append(surname_point)
+                return surname_point_lst
+            except Error as e:
+                print(e)
+            finally:
+                self.__cursor.close()
