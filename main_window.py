@@ -3,6 +3,7 @@ from designer.main_window_d import Ui_MainWindow
 from designer.employee_rating import Ui_Form
 from ReadXlsx import ReadExcelPandas
 from data_base import DataBase
+from writer import Writer
 import os
 
 
@@ -61,6 +62,7 @@ class MainWindow(QMainWindow):
 
         self.ui.btn_select_a_file.clicked.connect(self.set_table_widget)
         self.ui.btn_confirm_choice.clicked.connect(self.show_res_table_widget)
+        self.ui.btn_save.clicked.connect(self.save_result)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def set_table_widget(self):
@@ -107,9 +109,10 @@ class MainWindow(QMainWindow):
     def get_path_list_table_widget(self):
         return self.get_path_from_table_widget()
 
-    def pathname_concatenation(self) -> str:
+    def pathname_concatenation(self, file_extension: str) -> str:
         """
         Преобразует список, содержащий путь или несколько путей до файлов, возвращает сокращённое имя файла.
+        :param file_extension: str, расширение файла.
         :return:
             str: строка.
         """
@@ -121,11 +124,11 @@ class MainWindow(QMainWindow):
                 index_point = path.rindex('.')
                 edit_path = path[index_slash + 1:index_point]
                 res_name += edit_path + '_'
-            return res_name + '.db'
+            return res_name + file_extension
         else:
             index_slash = path_list[0].rindex('/')
             index_point = path_list[0].rindex('.')
-            edit_path = path_list[0][index_slash + 1:index_point] + '.db'
+            edit_path = path_list[0][index_slash + 1:index_point] + file_extension
             return edit_path
 
     def get_data_frame(self):
@@ -173,7 +176,7 @@ class MainWindow(QMainWindow):
         их данными.
         :return:
         """
-        name_db = self.pathname_concatenation()
+        name_db = self.pathname_concatenation('.db')
         all_surname_list = self.get_surname_list_from_df()
 
         all_df = self.get_data_frame()
@@ -267,7 +270,7 @@ class MainWindow(QMainWindow):
         :return:
         """
         self.__employee_dict = {}
-        name_db = self.pathname_concatenation()
+        name_db = self.pathname_concatenation('.db')
         all_surname_list = self.get_surname_list_from_df()
         if len(all_surname_list) > 1:
             all_surname_list = self.flatten_nested_list(all_surname_list)
@@ -292,6 +295,7 @@ class MainWindow(QMainWindow):
             self.append_point(point_deadline_projects_supervisor_list)
             self.append_sum_point()
             self.sort_dict_by_last_number()
+            print(self.__employee_dict)
 
     def show_res_table_widget(self):
         """
@@ -301,4 +305,11 @@ class MainWindow(QMainWindow):
         self.get_point_employee_from_db()
         self.res_table_widget = TableWidget(self.__employee_dict)
         self.res_table_widget.show()
+        self.ui.btn_save.setDisabled(False)
         self.res_table_widget.set_table_widget()
+
+    def save_result(self):
+        writer_file = Writer(self.__employee_dict)
+        file_name = self.pathname_concatenation('.txt')
+        writer_file.write_to_file(file_name)
+

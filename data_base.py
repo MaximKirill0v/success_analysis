@@ -44,8 +44,8 @@ class DataBase:
         Закрывает курсор бд.
         :return:
         """
-        print('курсор закрыт')
         self.__cursor.close()
+        print('курсор закрыт')
 
     def change_file_path(self, new_path: str):
         """
@@ -159,9 +159,7 @@ class DataBase:
             except Error:
                 return False
             finally:
-                print('До')
                 self.__cursor.close()
-                print('после')
 
     def get_point_employee(self, surname_list: list) -> list[list[tuple]]:
         """
@@ -219,7 +217,6 @@ class DataBase:
                               f"AND projects.supervisor_ID = supervisor.ID"
                 self.__cursor.execute(sql_request)
                 point_deadline_projects_supervisor_list = self.__cursor.fetchall()
-                print("-------", point_deadline_projects_supervisor_list)
                 return point_deadline_projects_supervisor_list
             except Error as e:
                 print(e)
