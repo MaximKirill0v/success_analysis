@@ -140,7 +140,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Success Employee"))
-        self.btn_select_a_file.setText(_translate("MainWindow", "Выбрать файл"))
+        self.btn_select_a_file.setText(_translate("MainWindow", "Выбрать один или несколько файлов"))
         self.btn_confirm_choice.setText(_translate("MainWindow", "Подтвердить выбор"))
         self.btn_save.setText(_translate("MainWindow", "Сохранить результат в txt файл"))
         self.selected_files.setText(_translate("MainWindow", "Выбранный файл:"))
