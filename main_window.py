@@ -16,6 +16,10 @@ class TableWidget(QMainWindow):
         self.table_widget = self.ui.tableWidget
 
     def set_table_widget(self):
+        """
+        Заполняет таблицу данными из self.__employee_dict.
+        :return:
+        """
         self.table_widget.setColumnCount(6)
         self.table_widget.setHorizontalHeaderLabels(
             ["Место", "Фамилия", "Итоговая сумма баллов", "План/факт", "Руководитель",
@@ -24,8 +28,8 @@ class TableWidget(QMainWindow):
             "QHeaderView::section {background-color: rgb(63, 63, 63); color: white;}")
         self.table_widget.verticalHeader().setVisible(False)
         self.table_widget.setColumnWidth(0, 50)
-        self.table_widget.setColumnWidth(1, 130)
-        self.table_widget.setColumnWidth(2, 140)
+        self.table_widget.setColumnWidth(1, 140)
+        self.table_widget.setColumnWidth(2, 160)
         self.table_widget.setColumnWidth(3, 110)
         self.table_widget.setColumnWidth(4, 110)
         self.table_widget.setColumnWidth(5, 110)
@@ -55,11 +59,15 @@ class MainWindow(QMainWindow):
         self.ui.btn_confirm_choice.setDisabled(True)
         self.ui.btn_save.setDisabled(True)
 
-        self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
+        self.ui.btn_select_a_file.clicked.connect(self.set_table_widget)
         self.ui.btn_confirm_choice.clicked.connect(self.show_res_table_widget)
         self.ui.btn_exit.clicked.connect(self.close)
 
-    def show_dialog(self):
+    def set_table_widget(self):
+        """
+        Заполняет таблицу QTableWidget выбранными excel файлами из диалогового окна.
+        :return:
+        """
         dialog_window = QFileDialog()
         file_names = dialog_window.getOpenFileNames(self, "Open File", "", "Excel Files (*.xlsx);")
         if file_names:
@@ -82,7 +90,12 @@ class MainWindow(QMainWindow):
             self.ui.btn_confirm_choice.setDisabled(False)
             return self.table_widget
 
-    def get_path_from_table_widget(self):
+    def get_path_from_table_widget(self) -> list[str]:
+        """
+        Возвращает список путей к excel файлам.
+        :return:
+            list[str] список строк
+        """
         path_list = []
         for row in range(self.table_widget.rowCount()):
             item = self.table_widget.item(row, 1)
@@ -94,7 +107,12 @@ class MainWindow(QMainWindow):
     def get_path_list_table_widget(self):
         return self.get_path_from_table_widget()
 
-    def pathname_concatenation(self):
+    def pathname_concatenation(self) -> str:
+        """
+        Преобразует список, содержащий путь или несколько путей до файлов, возвращает сокращённое имя файла.
+        :return:
+            str: строка.
+        """
         path_list = self.get_path_from_table_widget()
         if len(path_list) > 1:
             res_name = ''
@@ -111,6 +129,11 @@ class MainWindow(QMainWindow):
             return edit_path
 
     def get_data_frame(self):
+        """
+        Возвращает список, содержащий объекты класса pandas.core.frame.DataFrame, по путям до excel файлов.
+        :return:
+            list[df]: список, содержащий DataFrame.
+        """
         path_list = self.get_path_list_table_widget()
         all_df = []
         for path in path_list:
@@ -120,20 +143,36 @@ class MainWindow(QMainWindow):
             all_df.append(df)
         return all_df
 
-    def get_surname_list_from_df(self):
+    def get_surname_list_from_df(self) -> list[list[str]]:
+        """
+        Возвращает список списка фамилий сотрудников из Excel файла.
+        :return:
+            list[list[str]]
+        """
         path_list = self.get_path_list_table_widget()
-        all_path_list = []
+        all_surname_list = []
         for path in path_list:
             reader = ReadExcelPandas(path)
             surname_list = reader.read_employee_surname_list()
-            all_path_list.append(surname_list)
-        return all_path_list
+            all_surname_list.append(surname_list)
+        return all_surname_list
 
     @staticmethod
-    def check_for_file_existence(path_to_file: str):
+    def check_for_file_existence(path_to_file: str) -> bool:
+        """
+        Возвращает True если файл существует по данному пути и False если файл отсутствует по данному пути.
+        :param path_to_file: str, путь до файла
+        :return:
+            bool
+        """
         return os.path.exists(path_to_file)
 
     def create_db(self):
+        """
+        Создаёт базу данных, создаёт в ней таблицы 'supervisor', 'projects', 'employees', 'project_deadline' и заполняет
+        их данными.
+        :return:
+        """
         name_db = self.pathname_concatenation()
         all_surname_list = self.get_surname_list_from_df()
 
@@ -151,6 +190,12 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def calculate_values(lst: list[tuple]) -> int:
+        """
+        Возвращает число, обозначающее количество баллов по план/факт показателю.
+        :param lst: список кортежей
+        :return:
+            int
+        """
         result = []
         for item in lst:
             if not item[0] and not item[1]:
@@ -162,13 +207,25 @@ class MainWindow(QMainWindow):
         return sum(result)
 
     @staticmethod
-    def flatten_nested_list(nested_list):
+    def flatten_nested_list(nested_list) -> list[list[str]]:
+        """
+        Преобразует список списков в список списка.
+        :param nested_list: список списков
+        :return:
+            list[list[str]]
+        """
         flat_list = []
         for sublist in nested_list:
             flat_list.extend(sublist)
         return [flat_list]
 
     def convert_to_dictionary(self, employee_lst: list[tuple]):
+        """
+        Преобразует список кортежей, в каждом из которых содержатся фамилии сотрудников и их баллы, к словарю,
+        где ключи это фамилии, а значения - это список чисел.
+        :param employee_lst: список кортежей
+        :return:
+        """
         for name, number in employee_lst:
             if name not in self.__employee_dict:
                 self.__employee_dict[name] = [number]
@@ -176,6 +233,11 @@ class MainWindow(QMainWindow):
                 self.__employee_dict[name].append(number)
 
     def append_point(self, supervisor_list: list[tuple]):
+        """
+        Добавляет в значения словаря число
+        :param supervisor_list: список кортежей
+        :return:
+        """
         supervisor_lst = [item[0] for item in supervisor_list]
         for supervisor in self.__employee_dict.keys():
             if supervisor in supervisor_lst:
@@ -184,14 +246,26 @@ class MainWindow(QMainWindow):
                 self.__employee_dict[supervisor].append(0)
 
     def append_sum_point(self):
+        """
+        Добавляет к списку значения словаря число.
+        :return:
+        """
         for surname, point in self.__employee_dict.items():
             total_point = sum(point)
             point.append(total_point)
 
     def sort_dict_by_last_number(self):
+        """
+        Сортирует словарь по последнему индексу списка значения.
+        :return:
+        """
         self.__employee_dict = dict(sorted(self.__employee_dict.items(), key=lambda x: (x[1][-1]), reverse=True))
 
     def get_point_employee_from_db(self):
+        """
+        Заполняет self.__employee_dict данными из бд.
+        :return:
+        """
         self.__employee_dict = {}
         name_db = self.pathname_concatenation()
         all_surname_list = self.get_surname_list_from_df()
@@ -218,9 +292,12 @@ class MainWindow(QMainWindow):
             self.append_point(point_deadline_projects_supervisor_list)
             self.append_sum_point()
             self.sort_dict_by_last_number()
-            print(self.__employee_dict)
 
     def show_res_table_widget(self):
+        """
+        Выводит окно с итоговым рейтингом сотрудников.
+        :return:
+        """
         self.get_point_employee_from_db()
         self.res_table_widget = TableWidget(self.__employee_dict)
         self.res_table_widget.show()

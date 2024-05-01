@@ -12,11 +12,18 @@ class DataBase:
         self.__cursor = None
 
     def create_db(self):
-        print(self.__directory + self.__path_to_db)
+        """
+        Создаёт соединение с базой данных Sqlite3 по заданному пути.
+        :return:
+        """
         self.__connection = sqlite3.connect(self.__directory + self.__path_to_db)
         print(f'Соединение установлено.{self.__path_to_db}')
 
     def close_db(self):
+        """
+        Закрывает бд.
+        :return:
+        """
         self.__connection.close()
         print('Выход из ДБ')
 
@@ -25,24 +32,52 @@ class DataBase:
         print("Соединение закрыто.")
 
     def create_cursor(self):
+        """
+        Создаёт курсор бд.
+        :return:
+        """
         self.__cursor = self.__connection.cursor()
         print('курсор создан')
 
     def close_cursor(self):
+        """
+        Закрывает курсор бд.
+        :return:
+        """
         print('курсор закрыт')
         self.__cursor.close()
 
     def change_file_path(self, new_path: str):
+        """
+        Меняет путь до бд.
+        :param new_path:
+        :return:
+        """
         self.__path_to_db = new_path
 
     def rename_directory(self, new_name: str):
+        """
+        Меняет директорию до бд.
+        :param new_name:
+        :return:
+        """
         self.__directory = new_name
 
     def create_directory(self):
+        """
+        Создаёт папку в нужной директории если её там нет.
+        :return:
+        """
         if not os.path.exists(self.__directory):
             os.mkdir(self.__directory)
 
-    def create_table(self, name_table, column_names):
+    def create_table(self, name_table: str, column_names: list[str]):
+        """
+        Шаблон создания таблиц базы данных.
+        :param name_table: str, название таблицы в бд.
+        :param column_names: list, список названий полей с инициализацией типа поля.
+        :return:
+        """
         with self.__connection:
             self.create_cursor()
             try:
@@ -55,22 +90,45 @@ class DataBase:
                 self.close_cursor()
 
     def create_table_supervisor(self):
+        """
+        Создаёт таблицу в бд с названием supervisor.
+        :return:
+        """
         self.create_table('supervisor', ['ID INTEGER PRIMARY KEY', 'supervisor TEXT'])
 
     def create_table_projects(self):
+        """
+        Создаёт таблицу в бд с названием projects.
+        :return:
+         """
         self.create_table('projects', ['ID INTEGER PRIMARY KEY', 'project_name TEXT', 'supervisor_ID INTEGER',
                                        'FOREIGN KEY (supervisor_ID) REFERENCES supervisor(ID)'])
 
     def create_table_employees(self):
+        """
+        Создаёт таблицу в бд с названием employees.
+        :return:
+        """
         self.create_table('employees', ['ID INTEGER PRIMARY KEY', 'surname TEXT', 'plan TEXT', 'fact TEXT',
                                         'project_ID INTEGER', 'FOREIGN KEY (project_ID) REFERENCES projects(ID)'])
 
     def create_table_project_deadline(self):
+        """
+        Создаёт таблицу в бд с названием project_deadline.
+        :return:
+        """
         self.create_table('project_deadline', ['ID INTEGER PRIMARY KEY', 'planned_delivery_date INTEGER',
                                                'actual_delivery_date INTEGER', 'project_ID INTEGER',
                                                'FOREIGN KEY (project_ID) REFERENCES projects(ID)'])
 
     def insert_values_into_db(self, data_frame: pd.DataFrame, surname_list: list):
+        """
+        Заполняет таблицы: supervisor, projects, employees, project_deadline по данным из data_frame и списка
+        с фамилиями сотрудника.
+        :param data_frame: pd.DataFrame с представлением Excel файла
+        :param surname_list: list, список с фамилиями сотрудников.
+        :return:
+        """
 
         with self.__connection:
             self.create_cursor()
@@ -105,7 +163,13 @@ class DataBase:
                 self.__cursor.close()
                 print('после')
 
-    def get_point_employee(self, surname_list: list):
+    def get_point_employee(self, surname_list: list) -> list[list[tuple]]:
+        """
+        Возвращает список списков кортежей из базы данных с баллами из полей plan, fact таблицы employees.
+        :param surname_list: list, список с фамилиями сотрудников.
+        :return:
+            list[list[tuple]]
+        """
         with self.__connection:
             self.create_cursor()
             surname_point_lst = []
@@ -121,7 +185,12 @@ class DataBase:
             finally:
                 self.__cursor.close()
 
-    def get_supervisor_list(self):
+    def get_supervisor_list(self) -> list[tuple]:
+        """
+        Возвращает список кортежей с фамилиями руководителей.
+        :return:
+            list[tuple]
+        """
         with self.__connection:
             self.create_cursor()
             try:
@@ -134,7 +203,12 @@ class DataBase:
             finally:
                 self.__cursor.close()
 
-    def get_point_deadline_projects_supervisor(self):
+    def get_point_deadline_projects_supervisor(self) -> list[tuple]:
+        """
+        Возвращает список кортежей с фамилиями руководителей чьи проекты были сданы в срок.
+        :return:
+            list[tuple]
+        """
         with self.__connection:
             self.create_cursor()
             try:
@@ -145,6 +219,7 @@ class DataBase:
                               f"AND projects.supervisor_ID = supervisor.ID"
                 self.__cursor.execute(sql_request)
                 point_deadline_projects_supervisor_list = self.__cursor.fetchall()
+                print("-------", point_deadline_projects_supervisor_list)
                 return point_deadline_projects_supervisor_list
             except Error as e:
                 print(e)
