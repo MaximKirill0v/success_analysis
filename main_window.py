@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView, QHeaderView
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView, QMessageBox
 from designer.main_window_d import Ui_MainWindow
 from designer.employee_rating import Ui_Form
 from ReadXlsx import ReadExcelPandas
@@ -295,7 +295,6 @@ class MainWindow(QMainWindow):
             self.append_point(point_deadline_projects_supervisor_list)
             self.append_sum_point()
             self.sort_dict_by_last_number()
-            print(self.__employee_dict)
 
     def show_res_table_widget(self):
         """
@@ -309,7 +308,15 @@ class MainWindow(QMainWindow):
         self.res_table_widget.set_table_widget()
 
     def save_result(self):
+        """
+        Сохраняет рейтинг сотрудников в txt файл.
+        :return:
+        """
         writer_file = Writer(self.__employee_dict)
         file_name = self.pathname_concatenation('.txt')
-        writer_file.write_to_file(file_name)
+        writer_file.write_file_txt(file_name)
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Информация")
+        dlg.setText(f'Данные сохранились в файл {"text_file/" + file_name}')
+        dlg.exec()
 
