@@ -15,15 +15,16 @@ class Ui_Form(object):
         Form.resize(800, 600)
         Form.setMinimumSize(QtCore.QSize(800, 600))
         Form.setMaximumSize(QtCore.QSize(800, 600))
-        Form.setStyleSheet("background-color:qlineargradient(spread:pad, x1:0.134, y1:0.187, x2:1, y2:0.954, stop:0.0458404 rgba(1, 180, 148, 255), stop:1 rgba(65, 215, 154, 255));")
+        Form.setStyleSheet(
+            "background-color:qlineargradient(spread:pad, x1:0.134, y1:0.187, x2:1, y2:0.954, stop:0.0458404 rgba(1, 180, 148, 255), stop:1 rgba(65, 215, 154, 255));")
         self.tableWidget = QtWidgets.QTableWidget(parent=Form)
         self.tableWidget.setGeometry(QtCore.QRect(50, 20, 700, 550))
         self.tableWidget.setMinimumSize(QtCore.QSize(700, 550))
         self.tableWidget.setMaximumSize(QtCore.QSize(700, 500))
         self.tableWidget.setStyleSheet("background-color: rgb(63, 63, 63);\n"
-"border: 1px solid rgba(255,255,255, 100);\n"
-"border-radius: 7px;\n"
-"color:white;")
+                                       "border: 1px solid rgba(255,255,255, 100);\n"
+                                       "border-radius: 7px;\n"
+                                       "color:white;")
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
@@ -38,6 +39,7 @@ class Ui_Form(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     Form = QtWidgets.QWidget()
     ui = Ui_Form()

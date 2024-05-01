@@ -14,14 +14,16 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.setEnabled(True)
         MainWindow.resize(800, 600)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred,
+                                           QtWidgets.QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
         MainWindow.setMinimumSize(QtCore.QSize(800, 600))
         MainWindow.setMaximumSize(QtCore.QSize(800, 600))
-        MainWindow.setStyleSheet("background-color:qlineargradient(spread:pad, x1:0.134, y1:0.187, x2:1, y2:0.954, stop:0.0458404 rgba(1, 180, 148, 255), stop:1 rgba(65, 215, 154, 255));")
+        MainWindow.setStyleSheet(
+            "background-color:qlineargradient(spread:pad, x1:0.134, y1:0.187, x2:1, y2:0.954, stop:0.0458404 rgba(1, 180, 148, 255), stop:1 rgba(65, 215, 154, 255));")
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.btn_select_a_file = QtWidgets.QPushButton(parent=self.centralwidget)
@@ -32,19 +34,19 @@ class Ui_MainWindow(object):
         font.setPointSize(14)
         self.btn_select_a_file.setFont(font)
         self.btn_select_a_file.setStyleSheet("QPushButton{\n"
-"background-color:rgba(255,255,255,30);\n"
-"border:1px solid rgba(255,255,255,40);\n"
-"border-radius:7px;\n"
-"width: 400px;\n"
-"height: 100px;\n"
-"}\n"
-"QPushButton:hover{\n"
-"background-color:rgba(255,255,255,40);\n"
-"}\n"
-"\n"
-"QPushButton:pressed{\n"
-"background-color:rgba(255,255,255,90);\n"
-"}")
+                                             "background-color:rgba(255,255,255,30);\n"
+                                             "border:1px solid rgba(255,255,255,40);\n"
+                                             "border-radius:7px;\n"
+                                             "width: 400px;\n"
+                                             "height: 100px;\n"
+                                             "}\n"
+                                             "QPushButton:hover{\n"
+                                             "background-color:rgba(255,255,255,40);\n"
+                                             "}\n"
+                                             "\n"
+                                             "QPushButton:pressed{\n"
+                                             "background-color:rgba(255,255,255,90);\n"
+                                             "}")
         self.btn_select_a_file.setObjectName("btn_select_a_file")
         self.btn_confirm_choice = QtWidgets.QPushButton(parent=self.centralwidget)
         self.btn_confirm_choice.setGeometry(QtCore.QRect(60, 410, 340, 51))
@@ -54,19 +56,19 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.btn_confirm_choice.setFont(font)
         self.btn_confirm_choice.setStyleSheet("QPushButton{\n"
-"background-color:rgba(255,255,255,30);\n"
-"border:1px solid rgba(255,255,255,40);\n"
-"border-radius:7px;\n"
-"width: 340px;\n"
-"height: 50px;\n"
-"}\n"
-"QPushButton:hover{\n"
-"background-color:rgba(255,255,255,40);\n"
-"}\n"
-"\n"
-"QPushButton:pressed{\n"
-"background-color:rgba(255,255,255,90);\n"
-"}")
+                                              "background-color:rgba(255,255,255,30);\n"
+                                              "border:1px solid rgba(255,255,255,40);\n"
+                                              "border-radius:7px;\n"
+                                              "width: 340px;\n"
+                                              "height: 50px;\n"
+                                              "}\n"
+                                              "QPushButton:hover{\n"
+                                              "background-color:rgba(255,255,255,40);\n"
+                                              "}\n"
+                                              "\n"
+                                              "QPushButton:pressed{\n"
+                                              "background-color:rgba(255,255,255,90);\n"
+                                              "}")
         self.btn_confirm_choice.setObjectName("btn_confirm_choice")
         self.btn_save = QtWidgets.QPushButton(parent=self.centralwidget)
         self.btn_save.setGeometry(QtCore.QRect(420, 410, 340, 50))
@@ -76,19 +78,19 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.btn_save.setFont(font)
         self.btn_save.setStyleSheet("QPushButton{\n"
-"background-color:rgba(255,255,255,30);\n"
-"border:1px solid rgba(255,255,255,40);\n"
-"border-radius:7px;\n"
-"width: 340px;\n"
-"height: 50px;\n"
-"}\n"
-"QPushButton:hover{\n"
-"background-color:rgba(255,255,255,40);\n"
-"}\n"
-"\n"
-"QPushButton:pressed{\n"
-"background-color:rgba(255,255,255,90);\n"
-"}")
+                                    "background-color:rgba(255,255,255,30);\n"
+                                    "border:1px solid rgba(255,255,255,40);\n"
+                                    "border-radius:7px;\n"
+                                    "width: 340px;\n"
+                                    "height: 50px;\n"
+                                    "}\n"
+                                    "QPushButton:hover{\n"
+                                    "background-color:rgba(255,255,255,40);\n"
+                                    "}\n"
+                                    "\n"
+                                    "QPushButton:pressed{\n"
+                                    "background-color:rgba(255,255,255,90);\n"
+                                    "}")
         self.btn_save.setObjectName("btn_save")
         self.selected_files = QtWidgets.QLabel(parent=self.centralwidget)
         self.selected_files.setGeometry(QtCore.QRect(60, 110, 700, 20))
@@ -98,14 +100,15 @@ class Ui_MainWindow(object):
         font.setPointSize(10)
         self.selected_files.setFont(font)
         self.selected_files.setStyleSheet("background-color:none;")
-        self.selected_files.setAlignment(QtCore.Qt.AlignmentFlag.AlignBottom|QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignLeft)
+        self.selected_files.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignBottom | QtCore.Qt.AlignmentFlag.AlignLeading | QtCore.Qt.AlignmentFlag.AlignLeft)
         self.selected_files.setObjectName("selected_files")
         self.tableWidget = QtWidgets.QTableWidget(parent=self.centralwidget)
         self.tableWidget.setGeometry(QtCore.QRect(60, 140, 701, 231))
         self.tableWidget.setStyleSheet("background-color: rgb(63, 63, 63);\n"
-"border: 1px solid rgba(255,255,255, 100);\n"
-"border-radius: 7px;\n"
-"color:white;")
+                                       "border: 1px solid rgba(255,255,255, 100);\n"
+                                       "border-radius: 7px;\n"
+                                       "color:white;")
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
@@ -115,19 +118,19 @@ class Ui_MainWindow(object):
         font.setPointSize(14)
         self.btn_exit.setFont(font)
         self.btn_exit.setStyleSheet("QPushButton{\n"
-"background-color:rgba(255,255,255,30);\n"
-"border:1px solid rgba(255,255,255,40);\n"
-"border-radius:7px;\n"
-"width: 400px;\n"
-"height: 100px;\n"
-"}\n"
-"QPushButton:hover{\n"
-"background-color:rgba(255,255,255,40);\n"
-"}\n"
-"\n"
-"QPushButton:pressed{\n"
-"background-color:rgba(255,255,255,90);\n"
-"}")
+                                    "background-color:rgba(255,255,255,30);\n"
+                                    "border:1px solid rgba(255,255,255,40);\n"
+                                    "border-radius:7px;\n"
+                                    "width: 400px;\n"
+                                    "height: 100px;\n"
+                                    "}\n"
+                                    "QPushButton:hover{\n"
+                                    "background-color:rgba(255,255,255,40);\n"
+                                    "}\n"
+                                    "\n"
+                                    "QPushButton:pressed{\n"
+                                    "background-color:rgba(255,255,255,90);\n"
+                                    "}")
         self.btn_exit.setObjectName("btn_exit")
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -146,6 +149,7 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

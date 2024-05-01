@@ -1,14 +1,52 @@
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView
+from PyQt6.QtWidgets import QMainWindow, QFileDialog, QTableWidgetItem, QAbstractItemView, QHeaderView
 from designer.main_window_d import Ui_MainWindow
+from designer.employee_rating import Ui_Form
 from ReadXlsx import ReadExcelPandas
 from data_base import DataBase
 import os
+
+
+class TableWidget(QMainWindow):
+    def __init__(self, employee_dict: dict):
+        super(TableWidget, self).__init__()
+        self.ui = Ui_Form()
+        self.ui.setupUi(self)
+        self.__employee_dict = employee_dict
+
+        self.table_widget = self.ui.tableWidget
+
+    def set_table_widget(self):
+        self.table_widget.setColumnCount(6)
+        self.table_widget.setHorizontalHeaderLabels(
+            ["Место", "Фамилия", "Итоговая сумма баллов", "План/факт", "Руководитель",
+             "Сдача в срок"])
+        self.table_widget.horizontalHeader().setStyleSheet(
+            "QHeaderView::section {background-color: rgb(63, 63, 63); color: white;}")
+        self.table_widget.verticalHeader().setVisible(False)
+        self.table_widget.setColumnWidth(0, 50)
+        self.table_widget.setColumnWidth(1, 130)
+        self.table_widget.setColumnWidth(2, 140)
+        self.table_widget.setColumnWidth(3, 110)
+        self.table_widget.setColumnWidth(4, 110)
+        self.table_widget.setColumnWidth(5, 110)
+        self.table_widget.horizontalHeader().setStretchLastSection(True)
+
+        for row, (place, (surname, scores)) in enumerate(
+                zip(range(1, len(self.__employee_dict) + 1), self.__employee_dict.items())):
+            self.table_widget.insertRow(row)
+            self.table_widget.setItem(row, 0, QTableWidgetItem(str(place)))
+            self.table_widget.setItem(row, 1, QTableWidgetItem(surname))
+            self.table_widget.setItem(row, 2, QTableWidgetItem(str(scores[3])))
+            self.table_widget.setItem(row, 3, QTableWidgetItem(str(scores[0])))
+            self.table_widget.setItem(row, 4, QTableWidgetItem(str(scores[1])))
+            self.table_widget.setItem(row, 5, QTableWidgetItem(str(scores[2])))
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.table_widget = None
+        self.res_table_widget = None
         self.dialog_window = None
         self.reader_excel = None
         self.__employee_dict = {}
@@ -18,7 +56,7 @@ class MainWindow(QMainWindow):
         self.ui.btn_save.setDisabled(True)
 
         self.ui.btn_select_a_file.clicked.connect(self.show_dialog)
-        self.ui.btn_confirm_choice.clicked.connect(self.get_point_employee_from_db)
+        self.ui.btn_confirm_choice.clicked.connect(self.show_res_table_widget)
         self.ui.btn_exit.clicked.connect(self.close)
 
     def show_dialog(self):
@@ -174,14 +212,16 @@ class MainWindow(QMainWindow):
 
             point_plus_employee_man_days = list(zip(all_surname_list[0][0::2], points_all_employee_lst))
             self.convert_to_dictionary(point_plus_employee_man_days)
-            # print(f"Баллы чел-дни {self.__employee_dict}")
             supervisor_list = data_base.get_supervisor_list()
             point_deadline_projects_supervisor_list = data_base.get_point_deadline_projects_supervisor()
             self.append_point(supervisor_list)
-            # print(f"Баллы за руководителя {self.__employee_dict}")
             self.append_point(point_deadline_projects_supervisor_list)
-            print(f"Баллы за сдачу в срок {self.__employee_dict}")
             self.append_sum_point()
-            print("Конечный словарь", self.__employee_dict)
             self.sort_dict_by_last_number()
-            print("Отсортированный словарь", self.__employee_dict)
+            print(self.__employee_dict)
+
+    def show_res_table_widget(self):
+        self.get_point_employee_from_db()
+        self.res_table_widget = TableWidget(self.__employee_dict)
+        self.res_table_widget.show()
+        self.res_table_widget.set_table_widget()
