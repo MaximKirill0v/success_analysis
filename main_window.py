@@ -145,6 +145,14 @@ class MainWindow(QMainWindow):
             else:
                 self.__employee_dict[supervisor].append(0)
 
+    def append_sum_point(self):
+        for surname, point in self.__employee_dict.items():
+            total_point = sum(point)
+            point.append(total_point)
+
+    def sort_dict_by_last_number(self):
+        self.__employee_dict = dict(sorted(self.__employee_dict.items(), key=lambda x: (x[1][-1]), reverse=True))
+
     def get_point_employee_from_db(self):
         self.__employee_dict = {}
         name_db = self.pathname_concatenation()
@@ -165,11 +173,15 @@ class MainWindow(QMainWindow):
                 points_all_employee_lst.append(calc_points)
 
             point_plus_employee_man_days = list(zip(all_surname_list[0][0::2], points_all_employee_lst))
-            print(point_plus_employee_man_days)
             self.convert_to_dictionary(point_plus_employee_man_days)
+            # print(f"Баллы чел-дни {self.__employee_dict}")
             supervisor_list = data_base.get_supervisor_list()
             point_deadline_projects_supervisor_list = data_base.get_point_deadline_projects_supervisor()
             self.append_point(supervisor_list)
-            print(self.__employee_dict)
+            # print(f"Баллы за руководителя {self.__employee_dict}")
             self.append_point(point_deadline_projects_supervisor_list)
-            print(self.__employee_dict)
+            print(f"Баллы за сдачу в срок {self.__employee_dict}")
+            self.append_sum_point()
+            print("Конечный словарь", self.__employee_dict)
+            self.sort_dict_by_last_number()
+            print("Отсортированный словарь", self.__employee_dict)
